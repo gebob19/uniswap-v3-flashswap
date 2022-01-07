@@ -33,6 +33,7 @@ it("flashswaps for a loss lol", async function () {
   let tx = await WETH_contract.deposit(overrides)
   await tx.wait() 
 
+  // get some DAI 
   // approve swaper to spend 2 WETH
   tx = await WETH_contract.approve(swap_contract.address, ethers.utils.parseEther('2'))
   await tx.wait()
@@ -40,14 +41,11 @@ it("flashswaps for a loss lol", async function () {
   tx = await swap_contract.swapTokenMax(WETH_addr, DAI_addr, ethers.utils.parseEther('2'));
   await tx.wait()
   
-  // store how much DAI we have before flash -- to later compute the change in DAI after flash 
   const DAI_contract = new ethers.Contract(DAI_addr, erc_abi, signer)
   const balance_before = ethers.utils.formatEther((await DAI_contract.balanceOf(signer.address)))
-
-  // transfer $$ to contract so that it can pay for the fees 
+  // transfer 100 DAI to contract so that it can pay for the fees (bc we flash for a loss lol)
   // extra $$ (after fees) will be payed back 
-  // transfer 100 DAI to contract  
-  tx = await DAI_contract.transfer(flash_contract.address, ethers.utils.parseEther('100'))
+  tx = await DAI_contract.transfer(flash_contract.address, ethers.utils.parseEther('1000'))
   await tx.wait()
   
   // FLASH SWAP 
